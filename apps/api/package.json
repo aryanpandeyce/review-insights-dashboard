@@ -1,0 +1,47 @@
+{
+  "name": "@review-insights/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Review Insights Dashboard REST API (Node 20 + Express + pg)",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "lint": "eslint \"src/**/*.ts\" --max-warnings=0",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "migrate:up": "node-pg-migrate up -m migrations --database-url-var DATABASE_URL",
+    "migrate:down": "node-pg-migrate down -m migrations --database-url-var DATABASE_URL",
+    "migrate:create": "node-pg-migrate create -m migrations --sql-file",
+    "seed": "tsx src/db/seed.ts"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "multer": "^1.4.5-lts.1",
+    "node-pg-migrate": "^7.5.2",
+    "pg": "^8.12.0",
+    "pino": "^9.3.2",
+    "pino-http": "^10.3.0",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^20.14.12",
+    "@types/pg": "^8.11.6",
+    "@types/supertest": "^6.0.2",
+    "@types/swagger-ui-express": "^4.1.6",
+    "pino-pretty": "^11.2.2",
+    "supertest": "^7.0.0",
+    "tsx": "^4.16.2",
+    "vitest": "^2.0.5"
+  }
+}
