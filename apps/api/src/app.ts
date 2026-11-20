@@ -1,11 +1,13 @@
 import cors from 'cors';
 import express, { Express, Request, Response } from 'express';
 import helmet from 'helmet';
+import multer from 'multer';
 import pinoHttp from 'pino-http';
 import { env } from './config/env';
 import { logger } from './config/logger';
 import { checkDatabaseHealth } from './db/pool';
-import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
+import { AppError, errorHandler, notFoundHandler } from './middlewares/errorHandler';
+import { importRouter } from './routes/importRoutes';
 
 export function createApp(): Express {
   const app = express();
@@ -20,7 +22,7 @@ export function createApp(): Express {
   );
 
   // Body parsing
-  app.use(express.json({ limit: '2mb' }));
+  app.use(express.json({ limit: '5mb' }));
   app.use(express.urlencoded({ extended: true }));
 
   // Structured request logging
@@ -51,6 +53,22 @@ export function createApp(): Express {
 
   app.get('/health', healthHandler);
   app.get('/api/v1/health', healthHandler);
+
+  // API v1 Routes
+  app.use('/api/v1/imports', importRouter);
+
+  // Convert Multer file size errors to consistent AppError format
+  app.use((err: unknown, _req: Request, _res: Response, next: express.NextFunction) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        next(new AppError(413, 'FILE_TOO_LARGE', 'Uploaded file exceeds the 5MB limit'));
+        return;
+      }
+      next(new AppError(400, 'UPLOAD_ERROR', err.message));
+      return;
+    }
+    next(err);
+  });
 
   // 404 and Central Error Handler
   app.use(notFoundHandler);
