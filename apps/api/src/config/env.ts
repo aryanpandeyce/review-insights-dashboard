@@ -12,10 +12,10 @@ const envSchema = z.object({
   DATABASE_URL: z
     .string()
     .min(1, 'DATABASE_URL is required')
-    .default('postgresql://postgres:postgres@localhost:5432/review_insights'),
+    .default('postgresql://postgres:postgres@localhost:54320/review_insights'),
   TEST_DATABASE_URL: z
     .string()
-    .default('postgresql://postgres:postgres@localhost:5432/review_insights_test'),
+    .default('postgresql://postgres:postgres@localhost:54320/review_insights_test'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
