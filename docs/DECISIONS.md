@@ -53,3 +53,15 @@ This document records the key architectural and product decisions made while bui
   - `idx_reviews_score (score)`: covers score histogram and range slider queries.
   - `idx_reviews_full_text_trgm USING GIN (full_text gin_trgm_ops)`: uses PostgreSQL's `pg_trgm` extension to accelerate case-insensitive substring matching (`ILIKE '%term%'`) without sequential table scans.
   - `idx_reviews_flagged_queue (property_id, is_resolved, review_date DESC) WHERE is_flagged = TRUE`: partial index tailored specifically for the Flagged Reviews operational queue.
+
+---
+
+## ADR-006: Transparent Rule-Based Topic & Clause-Level Sentiment Engine
+
+- **Context**: Product managers need to see which operational topics (`cleanliness`, `staff`, `location`, `breakfast`, `wifi`, `noise`, `value`, `room_comfort`) drive guest satisfaction or complaints without relying on opaque or paid external LLM calls.
+- **Decision**: Implement a deterministic, clause-aware keyword + polarity lexicon analyzer (`apps/api/src/services/topicAnalyzer.ts`):
+  1. Splits review text on sentence boundaries and contrast conjunctions (`but`, `however`, `although`, `yet`) so mixed reviews (e.g., *"Friendly staff, but slow wifi"*) score each topic independently.
+  2. Combines section provenance (`positive_comment` vs `negative_comment`), topic-specific phrase rules, general sentiment tokens, and a 3-word lookbehind negation window (`not`, `no`, `never`, `hardly`, `wasn't`) that inverts polarity (e.g., *"not clean"* -> negative; *"no street noise"* -> positive).
+  3. Persists `matched_keywords` and an extracted `snippet` per topic in `review_topics` for transparent auditability in the UI.
+- **Trade-offs & Limits**: Cannot detect subtle sarcasm or implicit references lacking domain keywords; documented transparently in `README.md`.
+
