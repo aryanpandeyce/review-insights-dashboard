@@ -1,0 +1,34 @@
+{
+  "name": "review-insights-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Review Insights Dashboard for multi-property hotel analytics",
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev:api": "npm --workspace=@review-insights/api run dev",
+    "dev:web": "npm --workspace=@review-insights/web run dev",
+    "build": "npm --workspaces run build",
+    "lint": "npm --workspaces run lint",
+    "typecheck": "npm --workspaces run typecheck",
+    "test": "npm --workspaces --if-present run test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,cjs,json,md,css,sql}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,cjs,json,md,css,sql}\"",
+    "db:migrate": "npm --workspace=@review-insights/api run migrate:up",
+    "db:migrate:down": "npm --workspace=@review-insights/api run migrate:down",
+    "db:seed": "npm --workspace=@review-insights/api run seed"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
