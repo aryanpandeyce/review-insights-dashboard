@@ -65,3 +65,28 @@ This document records the key architectural and product decisions made while bui
   3. Persists `matched_keywords` and an extracted `snippet` per topic in `review_topics` for transparent auditability in the UI.
 - **Trade-offs & Limits**: Cannot detect subtle sarcasm or implicit references lacking domain keywords; documented transparently in `README.md`.
 
+---
+
+## ADR-007: CSS Custom Property Design System & Theme-Aware Recharts
+
+- **Context**: Analytics dashboards require high data density, strict visual hierarchy, WCAG AA contrast in both Light and Dark modes, and zero layout shift on numerical updates.
+- **Decision**:
+  - Define semantic CSS custom properties (`--bg-canvas`, `--bg-surface`, `--border-subtle`, `--text-primary`, `--brand-primary`, `--sentiment-pos/neu/neg`) in `apps/web/src/styles/globals.css` and map them into Tailwind utilities (`bg-canvas`, `bg-surface`, `text-content-primary`, etc.).
+  - Apply `font-variant-numeric: tabular-nums` to all KPI figures, badges, deltas, and tables.
+  - Drive Recharts grid, axis, and tooltip colors directly from `useTheme().resolvedTheme` and include a 1-click **Accessible Data Table** toggle on chart views.
+
+---
+
+## ADR-008: URL-Synced Filter State & Server-Side Pagination
+
+- **Context**: Analysts frequently bookmark or share specific dashboard slices (e.g., *"Berlin Business Hotel • Last 90 Days • Wi-Fi complaints"*).
+- **Decision**: Store global filters (`propertyId`, `preset`, `from`, `to`) and Explorer filters (`search`, `topic`, `sentiment`, `tripType`, `minScore`, `maxScore`, `sortBy`, `sortOrder`, `page`) in URL query parameters via `useSearchParams`, backed by parameterized server-side SQL pagination (`LIMIT $n OFFSET $m`).
+
+---
+
+## ADR-009: Free-Tier Cold Start Detection Banner
+
+- **Context**: Free-tier cloud containers (such as Render's free web tier) spin down after 15 minutes of inactivity and take 15–30 seconds to wake up on the initial request.
+- **Decision**: Track in-flight request latency inside `apps/web/src/lib/api.ts`. Whenever a request exceeds `2200ms`, broadcast a cold-start state to `<ColdStartBanner />` so the user sees an informative *"Waking up the API server..."* status banner alongside skeleton loaders instead of assuming the app is broken.
+
+
