@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import request from 'supertest';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createApp } from '../app';
-import { pool, query } from '../db/pool';
+import { query } from '../db/pool';
 import { SEED_PROPERTIES } from '../db/seedData';
 import { upsertProperty } from '../repositories/propertyRepository';
 
@@ -29,10 +29,6 @@ describe('POST /api/v1/imports — Idempotent CSV & JSON Import Integration Test
 
   beforeEach(async () => {
     await query('TRUNCATE TABLE review_topics, reviews, import_batches RESTART IDENTITY CASCADE');
-  });
-
-  afterAll(async () => {
-    await pool.end();
   });
 
   it('imports valid JSON reviews, tags topics, and deduplicates idempotently on re-import', async () => {

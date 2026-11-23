@@ -3,17 +3,26 @@ import express, { Express, Request, Response } from 'express';
 import helmet from 'helmet';
 import multer from 'multer';
 import pinoHttp from 'pino-http';
+import swaggerUi from 'swagger-ui-express';
 import { env } from './config/env';
 import { logger } from './config/logger';
+import { openApiSpec } from './config/openapi';
 import { checkDatabaseHealth } from './db/pool';
 import { AppError, errorHandler, notFoundHandler } from './middlewares/errorHandler';
+import { analyticsRouter } from './routes/analyticsRoutes';
 import { importRouter } from './routes/importRoutes';
+import { propertyRouter } from './routes/propertyRoutes';
+import { reviewRouter } from './routes/reviewRoutes';
 
 export function createApp(): Express {
   const app = express();
 
   // Security headers & CORS
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: false, // Allow Swagger UI assets at /api/docs
+    })
+  );
   app.use(
     cors({
       origin: env.CORS_ORIGIN.split(',').map((origin) => origin.trim()),
@@ -30,7 +39,7 @@ export function createApp(): Express {
     pinoHttp({
       logger,
       autoLogging: {
-        ignore: (req) => req.url === '/health',
+        ignore: (req) => req.url === '/health' || req.url === '/api/v1/health',
       },
     })
   );
@@ -54,7 +63,16 @@ export function createApp(): Express {
   app.get('/health', healthHandler);
   app.get('/api/v1/health', healthHandler);
 
+  // OpenAPI / Swagger UI documentation
+  app.get('/api/docs/openapi.json', (_req: Request, res: Response) => {
+    res.status(200).json(openApiSpec);
+  });
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
+
   // API v1 Routes
+  app.use('/api/v1/properties', propertyRouter);
+  app.use('/api/v1/analytics', analyticsRouter);
+  app.use('/api/v1/reviews', reviewRouter);
   app.use('/api/v1/imports', importRouter);
 
   // Convert Multer file size errors to consistent AppError format
