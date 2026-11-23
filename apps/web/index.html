@@ -3,9 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Review Insights Dashboard</title>
+    <meta
+      name="description"
+      content="Review Insights Dashboard — Multi-property hotel review analytics, topic sentiment intelligence, and operational action queue."
+    />
+    <title>Review Insights — Hospitality Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('review-insights-theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (!saved && prefersDark) || (saved === 'system' && prefersDark)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body>
+  <body class="bg-canvas text-content-primary antialiased selection:bg-brand-subtle selection:text-brand">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
